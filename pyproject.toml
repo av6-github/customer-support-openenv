@@ -1,0 +1,12 @@
+[project]
+name = "support-ops-env"
+version = "0.1.0"
+description = "SaaS Support Operations RL Environment"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+]
+
+[project.scripts]
+server = "server.app:main"
