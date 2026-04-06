@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from server.support_ops_env_environment import SupportOpsEnvironment
+from models import SupportOpsAction
 
 app = FastAPI()
 
@@ -17,8 +18,13 @@ def reset(task: str = "triage_sprint"):
 
 
 @app.post("/step")
-def step(action: dict):
-    return env.step(action)
+def step(action: SupportOpsAction):
+    return env.step(action.model_dump() if hasattr(action, 'model_dump') else action.dict())
+
+
+@app.get("/state")
+def get_state():
+    return env.state()
 
 
 def main():
@@ -26,4 +32,5 @@ def main():
     uvicorn.run(app, host="0.0.0.0", port=8000)
 
 
-main()
+if __name__ == "__main__":
+    main()

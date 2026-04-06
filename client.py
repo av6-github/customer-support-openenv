@@ -10,3 +10,6 @@ class EnvClient:
 
     def step(self, action):
         return requests.post(f"{self.base_url}/step", json=action).json()
+
+    def state(self):
+        return requests.get(f"{self.base_url}/state").json()
