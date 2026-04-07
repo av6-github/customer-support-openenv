@@ -28,16 +28,44 @@ A reinforcement-learning environment simulating real-world SaaS support operatio
 3. **Incident Cascade (hard)**: Introduces VIP customers and requires judicious use of tools with a limited budget to correctly resolve issues.
 
 ## Setup & Execution
-Must run with Python 3.9+ and have `uv` installed.
-```bash
-uv sync
-uv run server
-```
+Must run with Python 3.9+. We use `uv` for ultra-fast dependency and environment management.
+
+1. **Install `uv` (if not already installed):**
+   - **macOS / Linux:**
+     ```bash
+     curl -LsSf https://astral.sh/uv/install.sh | sh
+     ```
+   - **Windows:**
+     ```powershell
+     powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+     ```
+
+2. **Clone the repository:**
+   ```bash
+   git clone <your-repo-url>
+   cd customer-support-openenv
+   ```
+
+3. **Configure Environment variables:**
+   Create a `.env` file in the root directory and add your Hugging Face API token:
+   ```env
+   HF_TOKEN=your_huggingface_token_here
+   ```
+
+4. **Install Dependencies:**
+   ```bash
+   uv sync
+   ```
+
+5. **Start the Environment Server:**
+   Open a terminal and run the server (leave this running):
+   ```bash
+   uv run server
+   ```
 
 ## Inference & Baselines
-Run the baseline inference script using standard OpenAI models:
+In a **new terminal tab**, run the baseline inference script using the HuggingFace endpoint via OpenAI compatibility:
 ```bash
-export OPENAI_API_KEY=your_key_here
 uv run python inference.py
 ```
 *Expected Baseline Scores (GPT-4o-mini)*:

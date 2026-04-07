@@ -39,8 +39,8 @@ PRIORITY_ORDER = {"urgent": 0, "high": 1, "medium": 2, "low": 3}
 
 class SupportAgent:
 
-    def __init__(self, api_key, model="gpt-4o-mini"):
-        self.client = OpenAI(api_key=api_key)
+    def __init__(self, api_key, model="meta-llama/Meta-Llama-3-8B-Instruct", base_url=None):
+        self.client = OpenAI(api_key=api_key, base_url=base_url)
         self.model = model
         self._processed_tools = set()  # track which tickets we've used tools on
         self._merged_duplicates = set()

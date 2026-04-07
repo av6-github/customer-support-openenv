@@ -1,12 +1,16 @@
 import os
 from client import EnvClient
 from agent.agent import SupportAgent
+import dotenv
 
+dotenv.load_dotenv()
 
 # -----------------------------
 # CONFIG
 # -----------------------------
-API_KEY = os.getenv("OPENAI_API_KEY")  # MUST be set
+API_KEY = os.getenv("HF_TOKEN")
+API_BASE_URL = os.getenv("API_BASE_URL", "https://api-inference.huggingface.co/v1/")
+MODEL_NAME = os.getenv("MODEL_NAME", "meta-llama/Llama-3.2-3B-Instruct")
 BASE_URL = "http://localhost:8000"
 
 TASKS = [
@@ -60,10 +64,10 @@ def run_task(task_name, agent, client):
 if __name__ == "__main__":
 
     if not API_KEY:
-        raise ValueError("OPENAI_API_KEY environment variable not set")
+        raise ValueError("HF_TOKEN environment variable not set")
 
     client = EnvClient(BASE_URL)
-    agent = SupportAgent(API_KEY)
+    agent = SupportAgent(api_key=API_KEY, model=MODEL_NAME, base_url=API_BASE_URL)
 
     all_scores = []
 
