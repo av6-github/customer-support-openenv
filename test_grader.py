@@ -25,14 +25,15 @@ def run_perfect_episode(task_name):
         if task_name == "queue_pressure":
             for tid, g in gt.items():
                 if "duplicate_of" in g and tid not in env._state.duplicates:
-                    obs = env.step({
+                    result = env.step({
                         "action_type": "merge_duplicate",
                         "ticket_id": tid,
                         "duplicate_ticket_id": g["duplicate_of"]
                     })
                     step += 1
-                    total_reward += obs["reward"]
-                    done = obs["done"]
+                    total_reward += result["reward"]
+                    done = result["done"]
+                    obs = result["observation"]
                     if done:
                         break
 
@@ -44,25 +45,27 @@ def run_perfect_episode(task_name):
             for tid, g in gt.items():
                 if "incident_id" in g and f"inc_{tid}" not in used_tools:
                     used_tools.add(f"inc_{tid}")
-                    obs = env.step({
+                    result = env.step({
                         "action_type": "check_incident",
                         "incident_id": g["incident_id"]
                     })
                     step += 1
-                    total_reward += obs["reward"]
-                    done = obs["done"]
+                    total_reward += result["reward"]
+                    done = result["done"]
+                    obs = result["observation"]
                     if done:
                         break
 
                 if g.get("fraud_flag") and f"acc_{tid}" not in used_tools:
                     used_tools.add(f"acc_{tid}")
-                    obs = env.step({
+                    result = env.step({
                         "action_type": "lookup_account",
                         "account_id": tid
                     })
                     step += 1
-                    total_reward += obs["reward"]
-                    done = obs["done"]
+                    total_reward += result["reward"]
+                    done = result["done"]
+                    obs = result["observation"]
                     if done:
                         break
 
@@ -70,58 +73,62 @@ def run_perfect_episode(task_name):
             break
 
         if not ticket:
-            obs = env.step({"action_type": "submit"})
-            total_reward += obs["reward"]
-            done = obs["done"]
+            result = env.step({"action_type": "submit"})
+            total_reward += result["reward"]
+            done = result["done"]
             break
 
         tid = ticket["ticket_id"]
         g = gt[tid]
 
         # Step 1: categorize
-        obs = env.step({
+        result = env.step({
             "action_type": "categorize",
             "ticket_id": tid,
             "category": g["category"]
         })
         step += 1
-        total_reward += obs["reward"]
-        done = obs["done"]
+        total_reward += result["reward"]
+        done = result["done"]
+        obs = result["observation"]
         if done:
             break
 
         # Step 2: priority
-        obs = env.step({
+        result = env.step({
             "action_type": "set_priority",
             "ticket_id": tid,
             "priority": g["priority"]
         })
         step += 1
-        total_reward += obs["reward"]
-        done = obs["done"]
+        total_reward += result["reward"]
+        done = result["done"]
+        obs = result["observation"]
         if done:
             break
 
         # Step 3: route
-        obs = env.step({
+        result = env.step({
             "action_type": "route",
             "ticket_id": tid,
             "queue": g["queue"]
         })
         step += 1
-        total_reward += obs["reward"]
-        done = obs["done"]
+        total_reward += result["reward"]
+        done = result["done"]
+        obs = result["observation"]
         if done:
             break
 
         # Step 4: resolve
-        obs = env.step({
+        result = env.step({
             "action_type": "resolve",
             "ticket_id": tid
         })
         step += 1
-        total_reward += obs["reward"]
-        done = obs["done"]
+        total_reward += result["reward"]
+        done = result["done"]
+        obs = result["observation"]
 
     print(f"[{task_name}] steps={step} total_reward={total_reward:.4f}")
     assert total_reward <= 1.5, f"FAIL: reward {total_reward:.4f} is way too high!"

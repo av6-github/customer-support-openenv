@@ -9,7 +9,9 @@ dependencies = [
     "huggingface_hub",
     "openai",
     "requests",
-    "python-dotenv"
+    "python-dotenv",
+    "websockets",
+    "openenv-core",
 ]
 
 [project.scripts]

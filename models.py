@@ -34,6 +34,9 @@ class Ticket(BaseModel):
     priority: Optional[str] = None
     queue: Optional[str] = None
     status: str = "open"
+    churn_risk: float = 0.0
+    sla_deadline: Optional[int] = None
+    effort_cost: int = 1
 
 
 # -----------------------------
@@ -45,7 +48,9 @@ class SupportOpsObservation(BaseModel):
     max_steps: int
     tool_credits_remaining: int
     queue_health: float
+    system_health: float
     visible_churn_risk: Dict
+    last_tool_result: Optional[Dict] = None
 
 
 # -----------------------------
@@ -59,6 +64,7 @@ class SupportOpsState(BaseModel):
 
     tool_credits_remaining: int = 5
     queue_health: float = 1.0
+    system_health: float = 1.0
 
     # tracking
     categorized: Dict[str, str] = {}
@@ -70,5 +76,9 @@ class SupportOpsState(BaseModel):
     # advanced features
     churn_risk: Dict[str, float] = {}
     duplicates: Dict[str, str] = {}
+    clusters: Dict[str, str] = {}
     active_incidents: List[str] = []
+    incident_severity: Dict[str, str] = {}
+    incident_mapping: Dict[str, str] = {} # ticket_id -> incident_id
+    ticket_metadata: Dict[str, Dict[str, Any]] = {} # For vip, fraud_flag, etc.
     last_tool_result: Optional[Dict] = None

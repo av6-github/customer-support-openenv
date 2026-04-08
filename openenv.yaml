@@ -1,4 +1,5 @@
 spec_version: "1.0"
+name: "customer-support-openenv"
 type: "space"
 runtime: "fastapi"
 app: "server.app:app"

@@ -1,3 +1,12 @@
+---
+title: Customer Support OpenEnv
+emoji: 🎧
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 8000
+---
+
 # Support Ops Environment
 
 ## Motivation
@@ -35,9 +44,21 @@ Must run with Python 3.9+. We use `uv` for ultra-fast dependency and environment
      ```bash
      curl -LsSf https://astral.sh/uv/install.sh | sh
      ```
-   - **Windows:**
+   - **Windows (PowerShell):**
      ```powershell
      powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+     ```
+     After installation, **close and reopen your terminal** for PATH changes to take effect.
+
+     If `uv` is still not recognized, add it to PATH manually:
+     1. Open **Start → Settings → System → About → Advanced system settings → Environment Variables**
+     2. Under "User variables", select **Path** → **Edit** → **New**
+     3. Add: `%USERPROFILE%\.cargo\bin`
+     4. Click **OK** on all dialogs, then open a **new** terminal
+
+     Alternatively, you can install via **pip** (works everywhere):
+     ```bash
+     pip install uv
      ```
 
 2. **Clone the repository:**

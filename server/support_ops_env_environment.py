@@ -1,11 +1,22 @@
 from models import SupportOpsObservation, SupportOpsState, Ticket
 from server.tasks.task_data import (
     get_triage_sprint,
-    get_queue_pressure,
-    get_incident_cascade
+    get_churn_sla,
+    get_clustering,
+    get_incident_cascade,
+    get_policy_conflict,
 )
 from server.tools import mock_tools
 from server.graders import grader
+
+
+TASK_DISPATCH = {
+    "triage_sprint": get_triage_sprint,
+    "churn_sla": get_churn_sla,
+    "clustering": get_clustering,
+    "incident_cascade": get_incident_cascade,
+    "policy_conflict": get_policy_conflict,
+}
 
 
 class SupportOpsEnvironment:
@@ -23,22 +34,23 @@ class SupportOpsEnvironment:
         self._task_name = task
         self._cumulative_shaping = 0.0
 
-        if task == "triage_sprint":
-            data = get_triage_sprint()
-        elif task == "queue_pressure":
-            data = get_queue_pressure()
-        else:
-            data = get_incident_cascade()
+        loader = TASK_DISPATCH.get(task)
+        if not loader:
+            raise ValueError(f"Unknown task: {task}")
+        data = loader()
 
         tickets = {
             t["ticket_id"]: Ticket(
                 ticket_id=t["ticket_id"],
-                text=t["text"]
+                text=t["text"],
+                churn_risk=t.get("churn_risk", 0.0),
+                sla_deadline=t.get("sla_deadline"),
+                effort_cost=t.get("effort_cost", 1),
             )
             for t in data["tickets"]
         }
 
-        # store ground truth
+        # store ground truth (includes hidden labels)
         self._ground_truth = {
             t["ticket_id"]: t for t in data["tickets"]
         }
@@ -46,8 +58,29 @@ class SupportOpsEnvironment:
         self._state = SupportOpsState(
             tickets=tickets,
             max_steps=data.get("max_steps", 20),
-            tool_credits_remaining=data.get("tool_budget", 5)
+            tool_credits_remaining=data.get("tool_budget", 5),
         )
+
+        # Initialize churn risk from ticket data
+        for tid, t in self._ground_truth.items():
+            if t.get("churn_risk", 0) > 0:
+                self._state.churn_risk[tid] = t["churn_risk"]
+
+        # Initialize incident metadata
+        for tid, t in self._ground_truth.items():
+            if t.get("incident_id"):
+                self._state.incident_mapping[tid] = t["incident_id"]
+            if t.get("incident_severity"):
+                self._state.incident_severity[tid] = t["incident_severity"]
+
+        # Initialize policy metadata
+        for tid, t in self._ground_truth.items():
+            meta = {}
+            for key in ("vip", "fraud_flag", "account_age", "lifetime_value", "account_id"):
+                if key in t:
+                    meta[key] = t[key]
+            if meta:
+                self._state.ticket_metadata[tid] = meta
 
         return self._build_observation()
 
@@ -66,17 +99,37 @@ class SupportOpsEnvironment:
         self._state.step_count += 1
 
         # -----------------------------
-        # CHURN INCREASE
+        # CHURN INCREASE (all tasks)
         # -----------------------------
         for tid in self._state.tickets:
             current = self._state.churn_risk.get(tid, 0.1)
             self._state.churn_risk[tid] = min(1.0, current + 0.02)
 
         # -----------------------------
-        # ACTION HANDLERS
-        # (No positive step rewards — grader is authoritative)
-        # (Only small shaping penalties for wrong answers)
+        # SLA TRACKING (churn_sla task)
         # -----------------------------
+        if self._task_name == "churn_sla":
+            for tid, ticket in self._state.tickets.items():
+                if ticket.sla_deadline is not None and tid not in self._state.resolved_tickets:
+                    if self._state.step_count > ticket.sla_deadline:
+                        reward -= 0.01  # SLA violation penalty per step
+
+        # -----------------------------
+        # SYSTEM HEALTH DECAY (incident_cascade task)
+        # -----------------------------
+        if self._task_name == "incident_cascade":
+            self._state.system_health -= 0.01
+            # Additional decay for each unresolved incident ticket
+            for tid, inc_id in self._state.incident_mapping.items():
+                if tid not in self._state.resolved_tickets:
+                    severity = self._state.incident_severity.get(tid, "low")
+                    decay = {"critical": 0.015, "high": 0.01, "medium": 0.005, "low": 0.002}.get(severity, 0.002)
+                    self._state.system_health -= decay
+            self._state.system_health = max(0.0, self._state.system_health)
+
+        # =============================
+        # ACTION HANDLERS
+        # =============================
 
         if action_type == "categorize":
             category = action.get("category")
@@ -108,12 +161,41 @@ class SupportOpsEnvironment:
                 if inc not in self._state.active_incidents:
                     self._state.active_incidents.append(inc)
 
-        # Duplicate merge
+        # --- Duplicate merge (legacy) ---
         elif action_type == "merge_duplicate":
             child = action.get("ticket_id")
             parent = action.get("duplicate_ticket_id")
             if child and parent:
                 self._state.duplicates[child] = parent
+
+        # --- Cluster merge (Task 3) ---
+        elif action_type == "merge_cluster":
+            child = action.get("ticket_id")
+            parent = action.get("duplicate_ticket_id")
+            if child and parent:
+                gt_child = self._ground_truth.get(child, {})
+                gt_parent = self._ground_truth.get(parent, {})
+                child_cluster = gt_child.get("cluster_id")
+                parent_cluster = gt_parent.get("cluster_id")
+
+                if child_cluster and parent_cluster and child_cluster == parent_cluster:
+                    # Correct merge
+                    self._state.clusters[child] = parent
+                else:
+                    # Incorrect merge → penalty
+                    reward -= 0.03
+
+        # --- Escalate incident (Task 4) ---
+        elif action_type == "escalate_incident":
+            inc_id = action.get("incident_id")
+            if inc_id and self._state.tool_credits_remaining > 0:
+                self._state.tool_credits_remaining -= 1
+                # Mark incident as escalated → boost system health
+                if inc_id not in self._state.active_incidents:
+                    self._state.active_incidents.append(inc_id)
+                self._state.system_health = min(1.0, self._state.system_health + 0.05)
+            elif self._state.tool_credits_remaining <= 0:
+                reward -= 0.05
 
         # -----------------------------
         # TOOL CALLS
@@ -121,8 +203,20 @@ class SupportOpsEnvironment:
         elif action_type == "lookup_account":
             if self._state.tool_credits_remaining > 0:
                 self._state.tool_credits_remaining -= 1
-                result = mock_tools.lookup_account(action.get("account_id"))
-                # store tool result so agent can use it
+                acc_id = action.get("account_id", "")
+
+                # For policy_conflict task, return rich metadata
+                if self._task_name == "policy_conflict" and ticket_id:
+                    meta = self._state.ticket_metadata.get(ticket_id, {})
+                    result = {
+                        "vip": meta.get("vip", False),
+                        "fraud_flag": meta.get("fraud_flag", False),
+                        "account_age": meta.get("account_age", 1),
+                        "lifetime_value": meta.get("lifetime_value", 0.0),
+                    }
+                else:
+                    result = mock_tools.lookup_account(acc_id)
+
                 self._state.last_tool_result = result
             else:
                 reward -= 0.05
@@ -142,8 +236,25 @@ class SupportOpsEnvironment:
             self._state.tickets[ticket_id].status = "resolved"
             if ticket_id not in self._state.resolved_tickets:
                 self._state.resolved_tickets.append(ticket_id)
+
+                # Effort cost: advance step clock by (effort_cost - 1) extra ticks
+                if self._task_name == "churn_sla":
+                    effort = self._state.tickets[ticket_id].effort_cost
+                    if effort > 1:
+                        self._state.step_count += (effort - 1)
+
+                # Incident resolution boosts system health
+                if self._task_name == "incident_cascade" and ticket_id in self._state.incident_mapping:
+                    self._state.system_health = min(1.0, self._state.system_health + 0.08)
+
             # small shaping reward for completing a ticket
             reward += 0.02
+
+            # Policy conflict: penalize resolving fraud tickets with refund-like categories
+            if self._task_name == "policy_conflict":
+                meta = self._state.ticket_metadata.get(ticket_id, {})
+                if meta.get("fraud_flag") and self._state.categorized.get(ticket_id) == "billing":
+                    reward -= 0.1  # Heavy penalty: refunding a fraudster
 
         elif action_type == "submit":
             done = True
@@ -170,6 +281,10 @@ class SupportOpsEnvironment:
             done = True
             reward -= 0.1
 
+        if self._task_name == "incident_cascade" and self._state.system_health <= 0.0:
+            done = True
+            reward -= 0.1
+
         if self._state.step_count >= self._state.max_steps:
             done = True
 
@@ -185,18 +300,23 @@ class SupportOpsEnvironment:
             grader_score = 0.0
             if self._task_name == "triage_sprint":
                 grader_score = grader.grade_triage_sprint(
-                    self._state.__dict__,
-                    self._ground_truth
+                    self._state.__dict__, self._ground_truth
                 )
-            elif self._task_name == "queue_pressure":
-                grader_score = grader.grade_queue_pressure(
-                    self._state.__dict__,
-                    self._ground_truth
+            elif self._task_name == "churn_sla":
+                grader_score = grader.grade_churn_sla(
+                    self._state.__dict__, self._ground_truth
+                )
+            elif self._task_name == "clustering":
+                grader_score = grader.grade_clustering(
+                    self._state.__dict__, self._ground_truth
                 )
             elif self._task_name == "incident_cascade":
                 grader_score = grader.grade_incident_cascade(
-                    self._state.__dict__,
-                    self._ground_truth
+                    self._state.__dict__, self._ground_truth
+                )
+            elif self._task_name == "policy_conflict":
+                grader_score = grader.grade_policy_conflict(
+                    self._state.__dict__, self._ground_truth
                 )
 
             # Final reward = grader_score - prior accumulated shaping
@@ -221,7 +341,9 @@ class SupportOpsEnvironment:
             max_steps=self._state.max_steps,
             tool_credits_remaining=self._state.tool_credits_remaining,
             queue_health=self._state.queue_health,
-            visible_churn_risk=self._state.churn_risk
+            system_health=self._state.system_health,
+            visible_churn_risk=self._state.churn_risk,
+            last_tool_result=self._state.last_tool_result
         ).dict()
 
     # -----------------------------
@@ -231,14 +353,3 @@ class SupportOpsEnvironment:
         if self._state:
             return self._state.dict()
         return {}
-
-# -----------------------------
-# STATE (FULL INTERNAL STATE)
-# -----------------------------
-def state(self):
-    """
-    Returns full internal environment state.
-    Useful for debugging / evaluation.
-    """
-
-    return self._state.dict()
