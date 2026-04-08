@@ -17,8 +17,6 @@ if HF_TOKEN is None:
 
 BASE_URL = os.getenv("ENV_BASE_URL", "http://localhost:8000")
 
-# Single task per run — evaluator calls this script once per task
-TASK_NAME = os.getenv("TASK_NAME", "triage_sprint")
 ENV_NAME = "customer-support-openenv"
 
 
@@ -69,12 +67,22 @@ def run_task(task_name, agent, client):
     return score
 
 
-# -----------------------------
-# MAIN
-# -----------------------------
 if __name__ == "__main__":
 
     client = EnvClient(BASE_URL)
     agent = SupportAgent(api_key=HF_TOKEN, model=MODEL_NAME, base_url=API_BASE_URL)
 
-    score = run_task(TASK_NAME, agent, client)
+    task_env = os.getenv("TASK_NAME")
+    if task_env:
+        tasks_to_run = [task_env]
+    else:
+        tasks_to_run = [
+            "triage_sprint",
+            "churn_sla",
+            "clustering",
+            "incident_cascade",
+            "policy_conflict"
+        ]
+
+    for t in tasks_to_run:
+        score = run_task(t, agent, client)
