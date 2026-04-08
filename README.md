@@ -4,6 +4,8 @@ emoji: 🎧
 colorFrom: blue
 colorTo: purple
 sdk: docker
+tags:
+  - openenv
 app_port: 8000
 ---
 
