@@ -57,7 +57,10 @@ def grade_churn_sla(state, ground_truth):
         sla_compliant = 0
         for tid in sla_tickets:
             if tid in resolved:
-                sla_compliant += 1  # resolved = compliant (we assume resolve happened before violation)
+                res_step = state.get("resolution_step", {}).get(tid, max_steps)
+                deadline = ground_truth[tid].get("sla_deadline", max_steps)
+                if res_step <= deadline:
+                    sla_compliant += 1
         sla_score = sla_compliant / len(sla_tickets)
     else:
         sla_score = 1.0
@@ -79,13 +82,17 @@ def grade_churn_sla(state, ground_truth):
     # --- Completion rate (15%) ---
     completion_score = len(resolved) / total
 
-    return (
+    # Completion gate: no resolutions → score approaches 0
+    completion_gate = min(1.0, len(resolved) / max(1, total))
+
+    raw = (
         0.30 * hc_score
         + 0.25 * sla_score
         + 0.15 * efficiency_score
         + 0.15 * triage_score
         + 0.15 * completion_score
     )
+    return raw * completion_gate
 
 
 def grade_clustering(state, ground_truth):
@@ -172,12 +179,16 @@ def grade_clustering(state, ground_truth):
                       if state["categorized"].get(tid) == gt["category"])
     triage_score = cat_correct / total
 
-    return (
+    # Completion gate: must resolve at least some tickets to score
+    completion_gate = min(1.0, len(resolved) / max(1, total))
+
+    raw = (
         0.35 * clustering_score
         + 0.25 * merge_score
         + 0.20 * redundancy_score
         + 0.20 * triage_score
     )
+    return raw * completion_gate
 
 
 def grade_incident_cascade(state, ground_truth):
@@ -246,13 +257,17 @@ def grade_incident_cascade(state, ground_truth):
                       if state["routed"].get(tid) == gt["queue"])
     triage_score = (cat_correct + pri_correct + rte_correct) / (total * 3)
 
-    return (
+    # Completion gate: no resolutions → score approaches 0
+    completion_gate = min(1.0, len(resolved) / max(1, total))
+
+    raw = (
         0.25 * detection_score
         + 0.20 * severity_score
         + 0.20 * health_score
         + 0.15 * efficiency_score
         + 0.20 * triage_score
     )
+    return raw * completion_gate
 
 
 def grade_policy_conflict(state, ground_truth):
@@ -319,10 +334,15 @@ def grade_policy_conflict(state, ground_truth):
     else:
         resolution_score = 1.0
 
-    return (
+    # Completion gate: must do real work to score
+    safe_count = len(safe_tickets) if safe_tickets else total
+    completion_gate = min(1.0, len(resolved) / max(1, safe_count))
+
+    raw = (
         0.30 * policy_score
         + 0.25 * risk_score
         + 0.15 * tool_score
         + 0.15 * vip_score
         + 0.15 * resolution_score
     )
+    return raw * completion_gate

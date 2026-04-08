@@ -91,6 +91,207 @@ INTENT_TEMPLATES = {
     ],
 }
 
+# Paraphrase map: for each base template, a list of realistic rephrasings
+# describing THE SAME issue in different words (like a second customer reporting it)
+PARAPHRASE_MAP = {
+    # billing
+    "I was charged twice for my subscription": [
+        "There's a double charge on my account for the same subscription",
+        "My billing shows two identical subscription charges this month",
+        "I noticed a duplicate subscription fee on my latest statement",
+    ],
+    "Payment failed but the amount was still deducted": [
+        "My payment didn't go through but the money was taken anyway",
+        "Transaction shows failed but my bank account was still charged",
+        "The payment was declined yet the amount disappeared from my balance",
+    ],
+    "Refund has not been processed after 10 days": [
+        "I'm still waiting on a refund that was promised over a week ago",
+        "It's been 10+ days and my refund still hasn't shown up",
+        "The refund I was told I'd receive still hasn't hit my account",
+    ],
+    "My card was billed an incorrect amount": [
+        "The charge on my card doesn't match what I was supposed to pay",
+        "I was billed the wrong amount on my credit card",
+        "The amount deducted from my card is different from my order total",
+    ],
+    "There is a duplicate charge on my account": [
+        "My account shows the same charge appearing twice",
+        "I can see a repeated charge that shouldn't be there",
+    ],
+    "I see an unauthorized transaction on my statement": [
+        "There's a charge on my statement I didn't make",
+        "An unknown transaction appeared on my billing history",
+    ],
+    "The promotional discount was not applied to my invoice": [
+        "My promo code didn't reduce the price on the invoice",
+        "The discount I was supposed to get is missing from my bill",
+    ],
+    "My subscription was renewed at the wrong price": [
+        "The renewal charge is higher than what I was paying before",
+        "I was charged a different price when my plan auto-renewed",
+    ],
+    # auth
+    "I can't log into my account": [
+        "I'm unable to access my account no matter what I try",
+        "My login isn't working — I keep getting an error",
+        "I've been locked out and can't get into my account",
+    ],
+    "My password reset link is not working": [
+        "The reset password link I received says it's expired or invalid",
+        "I clicked the password reset email but it just shows an error",
+    ],
+    "Account has been locked after multiple attempts": [
+        "My account got locked because I entered the wrong password too many times",
+        "I'm locked out after several failed login attempts",
+    ],
+    "Two-factor authentication code never arrives": [
+        "I never get the 2FA code when trying to log in",
+        "The verification code for two-step login isn't being sent",
+    ],
+    "SSO integration is failing for my organization": [
+        "Our company's single sign-on stopped working with your platform",
+        "SSO login for our org keeps failing with an auth error",
+    ],
+    "I am unable to verify my identity on the portal": [
+        "The identity verification step keeps rejecting my documents",
+        "I can't complete the ID verification process on your site",
+    ],
+    "Session keeps expiring every few minutes": [
+        "I keep getting logged out every couple of minutes",
+        "My session times out way too quickly while I'm still using it",
+    ],
+    "My credentials are no longer accepted after the migration": [
+        "Since the system migration my old login doesn't work anymore",
+        "After the platform update my username and password stopped working",
+    ],
+    # bug
+    "App crashes immediately on startup": [
+        "The application crashes right after I open it",
+        "Every time I launch the app it immediately closes",
+        "I can't even get past the loading screen before it crashes",
+    ],
+    "Clicking the submit button does nothing": [
+        "The submit button is completely unresponsive when I click it",
+        "Nothing happens when I press submit on the form",
+    ],
+    "Data disappears after switching between tabs": [
+        "When I switch tabs all my entered data is gone",
+        "My work vanishes every time I navigate to another tab and back",
+    ],
+    "The export function generates a blank file": [
+        "When I export my data the file is completely empty",
+        "The downloaded export file has no content in it",
+    ],
+    "Search results show completely irrelevant items": [
+        "The search feature returns results that have nothing to do with my query",
+        "When I search for something the results are totally unrelated",
+    ],
+    "The notification badge shows the wrong count": [
+        "My notification counter is displaying an incorrect number",
+        "The unread notification count doesn't match my actual notifications",
+    ],
+    "Page layout breaks on mobile devices": [
+        "The page looks completely broken when I open it on my phone",
+        "The UI is messed up and unusable on mobile browsers",
+    ],
+    "Dropdown menu options are duplicated": [
+        "The dropdown shows each option listed twice",
+        "There are duplicate entries appearing in the dropdown menus",
+    ],
+    # feature
+    "Can we get a dark mode option": [
+        "It would be nice to have a dark theme available",
+    ],
+    "It would be great to have multi-language support": [
+        "Please consider adding support for multiple languages",
+    ],
+    "Please add the ability to export data to CSV": [
+        "We really need a CSV export feature for our data",
+    ],
+    "A calendar view for tasks would be really helpful": [
+        "Having tasks displayed in a calendar format would be useful",
+    ],
+    "We need bulk editing capabilities for admin users": [
+        "Admins should be able to edit multiple items at once",
+    ],
+    "Can you add keyboard shortcuts for common actions": [
+        "Keyboard shortcuts would speed up our workflow significantly",
+    ],
+    "An audit log feature would improve our compliance": [
+        "We need an activity log for compliance and auditing purposes",
+    ],
+    "We need webhook integration for third-party tools": [
+        "Please add webhook support so we can connect external services",
+    ],
+    # logistics
+    "My order has not been delivered yet": [
+        "I'm still waiting for my order and it hasn't arrived",
+        "My package never showed up even though it was supposed to be here",
+    ],
+    "Package was shipped to the wrong address": [
+        "You sent my package to a different address than what I entered",
+        "My delivery went to the wrong location",
+    ],
+    "The item arrived damaged and unusable": [
+        "What I received was broken and I can't use it",
+        "My order arrived in damaged condition",
+    ],
+    "Tracking link has shown no updates for a week": [
+        "The tracking page hasn't changed in over a week",
+        "My package tracking has been stuck with no movement for days",
+    ],
+    "I received someone else's items instead of mine": [
+        "The package I got contained items that aren't mine",
+        "You sent me the wrong person's order",
+    ],
+    "The delivery estimate keeps changing every day": [
+        "My estimated delivery date changes daily and I never know when it'll arrive",
+        "The expected delivery keeps getting pushed back every single day",
+    ],
+    "Return label is not generating properly": [
+        "I can't generate a return shipping label from your site",
+        "The return label page gives an error when I try to create one",
+    ],
+    "My replacement shipment has no tracking information": [
+        "The replacement you sent has no tracking number attached",
+        "I can't track my replacement order because there's no tracking info",
+    ],
+    # incident
+    "Your servers seem to be down": [
+        "It looks like your servers are offline right now",
+        "Is your service down? Nothing is loading for me",
+    ],
+    "The entire app is not loading at all": [
+        "The app won't load anything — just a blank screen",
+        "Nothing loads when I open the application",
+    ],
+    "Global outage reported across all regions": [
+        "We're seeing a worldwide outage affecting all our offices",
+        "Users in every region are reporting the service is completely down",
+    ],
+    "Everything is timing out for our whole team": [
+        "All requests are timing out for everyone on our team",
+        "Our entire team is experiencing timeout errors on every action",
+    ],
+    "The platform has been completely unresponsive since this morning": [
+        "Since this morning the platform hasn't responded to anything",
+        "The system has been dead since early today with no signs of recovery",
+    ],
+    "API endpoints are returning 503 errors": [
+        "All our API calls are failing with 503 service unavailable",
+        "We keep getting 503 errors from every endpoint we hit",
+    ],
+    "Dashboard is stuck on a loading spinner for everyone": [
+        "The dashboard just shows a spinner and never loads for any of us",
+        "Everyone on our team sees an infinite loading screen on the dashboard",
+    ],
+    "None of our integrations can connect to your service": [
+        "All our connected integrations lost connection to your platform",
+        "Every third-party integration we use shows your service as unreachable",
+    ],
+}
+
 # Tone modifiers applied to templates
 TONE_MODIFIERS = {
     "neutral": [
@@ -363,39 +564,48 @@ def _apply_tone(rng, text, difficulty):
 # LAYER 2+3+4 COMBINED — TICKET GENERATION
 # =============================================
 
-def _generate_ticket(rng, meta, index, difficulty):
+def _generate_ticket(rng, meta, index, difficulty, parent_text=None):
     """
     From scenario metadata → final ticket with text + labels.
+    If parent_text is provided (for duplicates), generate a paraphrase instead.
     """
     cat = meta["base_category"]
 
     # --- Layer 2: Pick base text ---
-    # Multi-intent injection (~15% for medium/hard)
-    use_multi = (
-        difficulty in ("medium", "hard")
-        and rng.random() < 0.15
-        and not meta["duplicate_of"]
-    )
-
-    if use_multi:
-        combo = rng.choice(MULTI_INTENT_COMBOS)
-        # Primary category is the first in the combo
-        if combo[0] == cat or combo[1] == cat:
-            text = combo[2]
+    if parent_text and meta.get("duplicate_of"):
+        # DUPLICATE: paraphrase the parent's base issue
+        paraphrases = PARAPHRASE_MAP.get(parent_text)
+        if paraphrases:
+            text = rng.choice(paraphrases)
         else:
-            # Pick a combo that starts with our category
-            matching = [c for c in MULTI_INTENT_COMBOS if c[0] == cat]
-            if matching:
-                combo = rng.choice(matching)
+            # Fallback: use synonym substitution on parent text
+            text = _apply_synonyms(rng, parent_text, probability=0.6)
+    else:
+        # Normal ticket: pick from templates
+        use_multi = (
+            difficulty in ("medium", "hard")
+            and rng.random() < 0.15
+            and not meta["duplicate_of"]
+        )
+
+        if use_multi:
+            combo = rng.choice(MULTI_INTENT_COMBOS)
+            if combo[0] == cat or combo[1] == cat:
                 text = combo[2]
             else:
-                text = rng.choice(INTENT_TEMPLATES[cat])
-    else:
-        text = rng.choice(INTENT_TEMPLATES[cat])
+                matching = [c for c in MULTI_INTENT_COMBOS if c[0] == cat]
+                if matching:
+                    combo = rng.choice(matching)
+                    text = combo[2]
+                else:
+                    text = rng.choice(INTENT_TEMPLATES[cat])
+        else:
+            text = rng.choice(INTENT_TEMPLATES[cat])
+
+    # Store the raw base text BEFORE applying variations (for paraphrase lookup)
+    meta["_base_text"] = text
 
     # --- Layer 4: Apply variations ---
-
-    # Synonym substitution (more aggressive on harder tasks)
     syn_prob = {"easy": 0.1, "medium": 0.25, "hard": 0.4}[difficulty]
     text = _apply_synonyms(rng, text, probability=syn_prob)
 
@@ -410,14 +620,12 @@ def _generate_ticket(rng, meta, index, difficulty):
     # --- Layer 3: Labels ---
     priority = PRIORITY_MAP[cat]
 
-    # Priority escalation from churn/urgency
     if meta["churn_risk"] > 0.7:
         if priority == "medium":
             priority = "high"
         elif priority == "low":
             priority = "medium"
 
-    # Check for urgency words in final text
     text_lower = text.lower()
     if any(w in text_lower for w in PRIORITY_ESCALATION_WORDS):
         if priority in ("medium", "low"):
@@ -506,10 +714,23 @@ def generate_tickets(task_name, n=None):
     metas = _generate_scenario(rng, n_tickets, difficulty)
 
     # Layer 2+3+4: Generate tickets
-    tickets = []
+    # Two-pass: generate parents first, then duplicates with parent text
+    tickets = [None] * n_tickets
+
+    # Pass 1: Generate non-duplicate tickets
     for i, meta in enumerate(metas):
-        ticket = _generate_ticket(rng, meta, i, difficulty)
-        tickets.append(ticket)
+        if not meta.get("duplicate_of"):
+            ticket = _generate_ticket(rng, meta, i, difficulty)
+            tickets[i] = ticket
+
+    # Pass 2: Generate duplicates using parent's base text for paraphrasing
+    for i, meta in enumerate(metas):
+        if meta.get("duplicate_of"):
+            parent_tid = meta["duplicate_of"]  # e.g. "T1"
+            parent_idx = int(parent_tid[1:]) - 1
+            parent_base_text = metas[parent_idx].get("_base_text", "")
+            ticket = _generate_ticket(rng, meta, i, difficulty, parent_text=parent_base_text)
+            tickets[i] = ticket
 
     # ---- Task-specific post-processing ----
 

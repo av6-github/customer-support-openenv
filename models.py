@@ -82,3 +82,7 @@ class SupportOpsState(BaseModel):
     incident_mapping: Dict[str, str] = {} # ticket_id -> incident_id
     ticket_metadata: Dict[str, Dict[str, Any]] = {} # For vip, fraud_flag, etc.
     last_tool_result: Optional[Dict] = None
+
+    # explicit penalty trackers
+    penalized_sla: set = set()
+    resolution_step: Dict[str, int] = {}

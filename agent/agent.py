@@ -182,11 +182,7 @@ class SupportAgent:
         return self._triage_pipeline(ticket)
 
     def _check_clusters(self, tickets):
-        """
-        Detect duplicate tickets using a two-tier approach:
-        1. SequenceMatcher text similarity (threshold > 0.35)
-        2. LLM fallback for semantic similarity when text matching fails
-        """
+        """Detect duplicate tickets using LLM semantic comparison."""
         open_tickets = [t for t in tickets if t["status"] != "resolved"]
 
         for i, t1 in enumerate(open_tickets):
@@ -200,19 +196,7 @@ class SupportAgent:
                 if pair_key in self._checked_pairs:
                     continue
 
-                # Tier 1: Fast text similarity
-                similarity = SequenceMatcher(
-                    None, t1["text"].lower(), t2["text"].lower()
-                ).ratio()
-                if similarity > 0.35:
-                    self._merged_clusters.add(t2["ticket_id"])
-                    return {
-                        "action_type": "merge_cluster",
-                        "ticket_id": t2["ticket_id"],
-                        "duplicate_ticket_id": t1["ticket_id"]
-                    }
-
-                # Tier 2: LLM semantic fallback (temperature=0 for determinism)
+                # LLM semantic comparison (temperature=0 for determinism)
                 self._checked_pairs.add(pair_key)
                 if self._llm_are_duplicates(t1["text"], t2["text"]):
                     self._merged_clusters.add(t2["ticket_id"])

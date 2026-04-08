@@ -111,20 +111,22 @@ class SupportOpsEnvironment:
         if self._task_name == "churn_sla":
             for tid, ticket in self._state.tickets.items():
                 if ticket.sla_deadline is not None and tid not in self._state.resolved_tickets:
-                    if self._state.step_count > ticket.sla_deadline:
-                        reward -= 0.01  # SLA violation penalty per step
+                    if self._state.step_count > ticket.sla_deadline and tid not in self._state.penalized_sla:
+                        reward -= 0.10  # SLA violation penalty per ticket (applied once)
+                        self._state.penalized_sla.add(tid)
 
         # -----------------------------
         # SYSTEM HEALTH DECAY (incident_cascade task)
         # -----------------------------
         if self._task_name == "incident_cascade":
-            self._state.system_health -= 0.01
-            # Additional decay for each unresolved incident ticket
-            for tid, inc_id in self._state.incident_mapping.items():
-                if tid not in self._state.resolved_tickets:
-                    severity = self._state.incident_severity.get(tid, "low")
-                    decay = {"critical": 0.015, "high": 0.01, "medium": 0.005, "low": 0.002}.get(severity, 0.002)
-                    self._state.system_health -= decay
+            self._state.system_health -= 0.01  # Base decay
+            
+            # Reward for resolving incidents instead of punishing for unresolved ones
+            critical_resolved = sum(1 for tid, inc_id in self._state.incident_mapping.items()
+                                    if tid in self._state.resolved_tickets and 
+                                    self._state.incident_severity.get(tid) == "critical")
+            
+            self._state.system_health = min(1.0, self._state.system_health + (critical_resolved * 0.02))
             self._state.system_health = max(0.0, self._state.system_health)
 
         # =============================
@@ -179,8 +181,8 @@ class SupportOpsEnvironment:
                 parent_cluster = gt_parent.get("cluster_id")
 
                 if child_cluster and parent_cluster and child_cluster == parent_cluster:
-                    # Correct merge
-                    self._state.clusters[child] = parent
+                    # Correct merge with transitive closure
+                    self._state.clusters[child] = parent if parent not in self._state.clusters else self._state.clusters[parent]
                 else:
                     # Incorrect merge → penalty
                     reward -= 0.03
@@ -218,6 +220,7 @@ class SupportOpsEnvironment:
                     result = mock_tools.lookup_account(acc_id)
 
                 self._state.last_tool_result = result
+                reward += 0.01  # Small immediate reward for using tool wisely
             else:
                 reward -= 0.05
 
@@ -226,6 +229,7 @@ class SupportOpsEnvironment:
                 self._state.tool_credits_remaining -= 1
                 result = mock_tools.check_incident(action.get("incident_id"))
                 self._state.last_tool_result = result
+                reward += 0.01  # Small immediate reward for using tool wisely
             else:
                 reward -= 0.05
 
@@ -236,6 +240,7 @@ class SupportOpsEnvironment:
             self._state.tickets[ticket_id].status = "resolved"
             if ticket_id not in self._state.resolved_tickets:
                 self._state.resolved_tickets.append(ticket_id)
+                self._state.resolution_step[ticket_id] = self._state.step_count
 
                 # Effort cost: advance step clock by (effort_cost - 1) extra ticks
                 if self._task_name == "churn_sla":
@@ -270,8 +275,9 @@ class SupportOpsEnvironment:
         # QUEUE HEALTH UPDATE
         # -----------------------------
         resolved_count = len(self._state.resolved_tickets)
+        resolved_this_step = 1 if action_type == "resolve" else 0
         self._state.queue_health -= 0.02
-        self._state.queue_health += resolved_count * 0.005
+        self._state.queue_health += resolved_this_step * 0.01  # Reward per-step resolutions
         self._state.queue_health = max(0.0, min(1.0, self._state.queue_health))
 
         # -----------------------------
