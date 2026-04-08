@@ -3,3 +3,15 @@ name: "customer-support-openenv"
 type: "space"
 runtime: "fastapi"
 app: "server.app:app"
+
+tasks:
+  - id: triage_sprint
+    grader: server.graders.grader:grade_triage_sprint
+  - id: churn_sla
+    grader: server.graders.grader:grade_churn_sla
+  - id: clustering
+    grader: server.graders.grader:grade_clustering
+  - id: incident_cascade
+    grader: server.graders.grader:grade_incident_cascade
+  - id: policy_conflict
+    grader: server.graders.grader:grade_policy_conflict
