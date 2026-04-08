@@ -327,7 +327,14 @@ class SupportOpsEnvironment:
 
             # Final reward = grader_score - prior accumulated shaping
             # so total_reward across all steps = grader_score
-            reward = grader_score - (self._cumulative_shaping - reward)
+            reward_diff = grader_score - (self._cumulative_shaping - reward)
+            
+            # User constraint: individual step rewards must be strictly bound.
+            # Compensatory rewards that push a single step > 1.0 are invalid.
+            reward = reward_diff
+        
+        # Enforce strict OpenEnv [-1.0, 1.0] bound on all step rewards
+        reward = max(-1.0, min(1.0, float(reward)))
 
         return {
             "observation": self._build_observation(),
