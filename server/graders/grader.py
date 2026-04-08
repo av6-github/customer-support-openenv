@@ -41,6 +41,7 @@ def grade_churn_sla(state, ground_truth):
         return 0.0
 
     resolved = state.get("resolved_tickets", [])
+    max_steps = state.get("max_steps", 35)
 
     # --- High churn resolved (30%) ---
     high_churn = [tid for tid, gt in ground_truth.items() if gt.get("churn_risk", 0) >= 0.7]
@@ -66,7 +67,6 @@ def grade_churn_sla(state, ground_truth):
         sla_score = 1.0
 
     # --- Efficiency (15%) ---
-    max_steps = state.get("max_steps", 35)
     steps_used = state.get("step_count", max_steps)
     efficiency_score = max(0.0, 1.0 - (steps_used / max_steps))
 
