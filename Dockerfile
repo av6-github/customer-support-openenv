@@ -6,11 +6,12 @@ WORKDIR /app
 RUN pip install uv
 
 # Copy project files from repo root (build context = repo root)
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml uv.lock requirements.txt ./
 COPY models.py ticket_generator.py client.py ./
 COPY server/ ./server/
 COPY agent/ ./agent/
 
+RUN pip install --no-cache-dir -r requirements.txt
 RUN uv sync
 
 ENV WORKERS=4
