@@ -1,6 +1,7 @@
 import string
 from difflib import SequenceMatcher
 from openai import OpenAI
+from server.logger import AgentLogger
 
 ACTIONS = ["categorize", "set_priority", "route", "resolve", "merge_duplicate",
            "merge_cluster", "escalate_incident",
@@ -74,6 +75,7 @@ class SupportAgent:
     def __init__(self, api_key, model="meta-llama/Meta-Llama-3-8B-Instruct", base_url=None):
         self.client = OpenAI(api_key=api_key, base_url=base_url)
         self.model = model
+        self.logger = AgentLogger()
         self._processed_tools = set()
         self._merged_duplicates = set()
         self._merged_clusters = set()
@@ -109,17 +111,20 @@ class SupportAgent:
 
         # Dispatch to task-specific handler
         if self.current_task == "triage_sprint":
-            return self._handle_triage(obs)
+            action = self._handle_triage(obs)
         elif self.current_task == "churn_sla":
-            return self._handle_churn_sla(obs)
+            action = self._handle_churn_sla(obs)
         elif self.current_task == "clustering":
-            return self._handle_clustering(obs)
+            action = self._handle_clustering(obs)
         elif self.current_task == "incident_cascade":
-            return self._handle_incident_cascade(obs)
+            action = self._handle_incident_cascade(obs)
         elif self.current_task == "policy_conflict":
-            return self._handle_policy_conflict(obs)
+            action = self._handle_policy_conflict(obs)
         else:
-            return self._handle_triage(obs)
+            action = self._handle_triage(obs)
+            
+        self.logger.log_decision(f"Tick {obs.get('step_count', 0)} -> {action.get('action_type', 'unknown')} on {action.get('ticket_id', 'none')}")
+        return action
 
     # =============================================
     # TASK 1 — TRIAGE SPRINT (unchanged logic)

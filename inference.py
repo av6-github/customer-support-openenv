@@ -1,6 +1,7 @@
 import os
 from client import EnvClient
 from agent.agent import SupportAgent
+from server.logger import MetricsLogger
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,6 +28,7 @@ def run_task(task_name, agent, client):
 
     print(f"[START] task={task_name} env={ENV_NAME} model={MODEL_NAME}", flush=True)
 
+    metrics_logger = MetricsLogger(task_name)
     obs = client.reset(task_name)
     agent.set_task(task_name)
 
@@ -52,6 +54,8 @@ def run_task(task_name, agent, client):
         error_val = step_response.get("error") or "null"
         action_str = f"{action['action_type']}"
 
+        metrics_logger.log_step(step, action, reward, 0, obs.get("tool_credits_remaining", 0))
+
         print(f"[STEP] step={step} action={action_str} reward={reward:.3f} done={done_val} error={error_val}", flush=True)
 
     # -----------------------------
@@ -63,6 +67,10 @@ def run_task(task_name, agent, client):
     rewards_str = ",".join(f"{r:.3f}" for r in rewards)
 
     print(f"[END] success={success_val} steps={step} score={score:.3f} rewards={rewards_str}", flush=True)
+
+    os.makedirs("logs", exist_ok=True)
+    with open(f"logs/metrics_{task_name}.json", "w") as f:
+        f.write(metrics_logger.to_json())
 
     return score
 

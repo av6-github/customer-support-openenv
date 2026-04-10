@@ -1,11 +1,12 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from server.support_ops_env_environment import SupportOpsEnvironment
 from models import SupportOpsAction
+from server.session_manager import SessionManager
 import json
 
 app = FastAPI()
 
-env = SupportOpsEnvironment()
+manager = SessionManager()
 
 
 # -----------------------------
@@ -18,17 +19,20 @@ def root():
 
 
 @app.post("/reset")
-def reset(task: str = "triage_sprint"):
+def reset(task: str = "triage_sprint", session_id: str = "default"):
+    env = manager.get_env(session_id)
     return env.reset(task)
 
 
 @app.post("/step")
-def step(action: SupportOpsAction):
+def step(action: SupportOpsAction, session_id: str = "default"):
+    env = manager.get_env(session_id)
     return env.step(action.model_dump() if hasattr(action, 'model_dump') else action.dict())
 
 
 @app.get("/state")
-def get_state():
+def get_state(session_id: str = "default"):
+    env = manager.get_env(session_id)
     return env.state()
 
 

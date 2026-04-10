@@ -1,5 +1,6 @@
 import requests
 import json
+import uuid
 
 try:
     import websockets
@@ -14,15 +15,16 @@ class EnvClient:
 
     def __init__(self, base_url="http://localhost:8000"):
         self.base_url = base_url
+        self.session_id = str(uuid.uuid4())
 
     def reset(self, task="triage_sprint"):
-        return requests.post(f"{self.base_url}/reset", params={"task": task}).json()
+        return requests.post(f"{self.base_url}/reset", params={"task": task, "session_id": self.session_id}).json()
 
     def step(self, action):
-        return requests.post(f"{self.base_url}/step", json=action).json()
+        return requests.post(f"{self.base_url}/step", json=action, params={"session_id": self.session_id}).json()
 
     def state(self):
-        return requests.get(f"{self.base_url}/state").json()
+        return requests.get(f"{self.base_url}/state", params={"session_id": self.session_id}).json()
 
 
 class WebSocketEnvClient:

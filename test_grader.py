@@ -21,8 +21,8 @@ def run_perfect_episode(task_name):
                 ticket = t
                 break
 
-        # --- Phase: Duplicate merge (queue_pressure) ---
-        if task_name == "queue_pressure":
+        # --- Phase: Duplicate merge (clustering) ---
+        if task_name == "clustering":
             for tid, g in gt.items():
                 if "duplicate_of" in g and tid not in env._state.duplicates:
                     result = env.step({
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     print("PERFECT EPISODE TESTS")
     print("=" * 50)
 
-    tasks = ["triage_sprint", "queue_pressure", "incident_cascade"]
+    tasks = ["triage_sprint", "clustering", "incident_cascade"]
     scores = {}
 
     for task in tasks:

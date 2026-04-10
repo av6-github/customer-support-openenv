@@ -1,0 +1,299 @@
+{
+  "task": "policy_conflict",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "action_type": "lookup_account",
+        "ticket_id": "T1",
+        "account_id": "T1"
+      },
+      "reward": 0.01,
+      "llm_tokens": 0,
+      "tool_calls": 4,
+      "timestamp": "2026-04-10T18:44:57.341507"
+    },
+    {
+      "step": 2,
+      "action": {
+        "action_type": "lookup_account",
+        "ticket_id": "T2",
+        "account_id": "T2"
+      },
+      "reward": 0.01,
+      "llm_tokens": 0,
+      "tool_calls": 3,
+      "timestamp": "2026-04-10T18:44:57.345750"
+    },
+    {
+      "step": 3,
+      "action": {
+        "action_type": "lookup_account",
+        "ticket_id": "T3",
+        "account_id": "T3"
+      },
+      "reward": 0.01,
+      "llm_tokens": 0,
+      "tool_calls": 2,
+      "timestamp": "2026-04-10T18:44:57.350436"
+    },
+    {
+      "step": 4,
+      "action": {
+        "action_type": "lookup_account",
+        "ticket_id": "T4",
+        "account_id": "T4"
+      },
+      "reward": 0.01,
+      "llm_tokens": 0,
+      "tool_calls": 1,
+      "timestamp": "2026-04-10T18:44:57.353575"
+    },
+    {
+      "step": 5,
+      "action": {
+        "action_type": "lookup_account",
+        "ticket_id": "T5",
+        "account_id": "T5"
+      },
+      "reward": 0.0,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.356061"
+    },
+    {
+      "step": 6,
+      "action": {
+        "action_type": "categorize",
+        "ticket_id": "T1",
+        "category": "incident"
+      },
+      "reward": -0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.359521"
+    },
+    {
+      "step": 7,
+      "action": {
+        "action_type": "set_priority",
+        "ticket_id": "T1",
+        "priority": "urgent"
+      },
+      "reward": -0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.363390"
+    },
+    {
+      "step": 8,
+      "action": {
+        "action_type": "route",
+        "ticket_id": "T1",
+        "queue": "engineering"
+      },
+      "reward": -0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.366984"
+    },
+    {
+      "step": 9,
+      "action": {
+        "action_type": "resolve",
+        "ticket_id": "T1"
+      },
+      "reward": 0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.371162"
+    },
+    {
+      "step": 10,
+      "action": {
+        "action_type": "categorize",
+        "ticket_id": "T5",
+        "category": "feature"
+      },
+      "reward": -0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.375295"
+    },
+    {
+      "step": 11,
+      "action": {
+        "action_type": "set_priority",
+        "ticket_id": "T5",
+        "priority": "low"
+      },
+      "reward": -0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.379115"
+    },
+    {
+      "step": 12,
+      "action": {
+        "action_type": "route",
+        "ticket_id": "T5",
+        "queue": "product"
+      },
+      "reward": -0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.382479"
+    },
+    {
+      "step": 13,
+      "action": {
+        "action_type": "resolve",
+        "ticket_id": "T5"
+      },
+      "reward": 0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.385345"
+    },
+    {
+      "step": 14,
+      "action": {
+        "action_type": "categorize",
+        "ticket_id": "T4",
+        "category": "feature"
+      },
+      "reward": -0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.387793"
+    },
+    {
+      "step": 15,
+      "action": {
+        "action_type": "set_priority",
+        "ticket_id": "T4",
+        "priority": "low"
+      },
+      "reward": -0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.390054"
+    },
+    {
+      "step": 16,
+      "action": {
+        "action_type": "route",
+        "ticket_id": "T4",
+        "queue": "product"
+      },
+      "reward": -0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.393723"
+    },
+    {
+      "step": 17,
+      "action": {
+        "action_type": "resolve",
+        "ticket_id": "T4"
+      },
+      "reward": 0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.397470"
+    },
+    {
+      "step": 18,
+      "action": {
+        "action_type": "categorize",
+        "ticket_id": "T2",
+        "category": "bug"
+      },
+      "reward": -0.03,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.400243"
+    },
+    {
+      "step": 19,
+      "action": {
+        "action_type": "set_priority",
+        "ticket_id": "T2",
+        "priority": "high"
+      },
+      "reward": -0.03,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.402519"
+    },
+    {
+      "step": 20,
+      "action": {
+        "action_type": "route",
+        "ticket_id": "T2",
+        "queue": "engineering"
+      },
+      "reward": -0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.405421"
+    },
+    {
+      "step": 21,
+      "action": {
+        "action_type": "resolve",
+        "ticket_id": "T2"
+      },
+      "reward": 0.02,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.408656"
+    },
+    {
+      "step": 22,
+      "action": {
+        "action_type": "categorize",
+        "ticket_id": "T3",
+        "category": "bug"
+      },
+      "reward": -0.02,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.411351"
+    },
+    {
+      "step": 23,
+      "action": {
+        "action_type": "set_priority",
+        "ticket_id": "T3",
+        "priority": "high"
+      },
+      "reward": -0.02,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.413383"
+    },
+    {
+      "step": 24,
+      "action": {
+        "action_type": "route",
+        "ticket_id": "T3",
+        "queue": "engineering"
+      },
+      "reward": -0.02,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.415007"
+    },
+    {
+      "step": 25,
+      "action": {
+        "action_type": "submit"
+      },
+      "reward": 1.0,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:57.416762"
+    }
+  ]
+}

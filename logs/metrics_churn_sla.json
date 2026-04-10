@@ -1,0 +1,297 @@
+{
+  "task": "churn_sla",
+  "steps": [
+    {
+      "step": 1,
+      "action": {
+        "action_type": "categorize",
+        "ticket_id": "T3",
+        "category": "incident"
+      },
+      "reward": -0.03,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.797937"
+    },
+    {
+      "step": 2,
+      "action": {
+        "action_type": "set_priority",
+        "ticket_id": "T3",
+        "priority": "urgent"
+      },
+      "reward": -0.03,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.801236"
+    },
+    {
+      "step": 3,
+      "action": {
+        "action_type": "route",
+        "ticket_id": "T3",
+        "queue": "engineering"
+      },
+      "reward": -0.13,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.803755"
+    },
+    {
+      "step": 4,
+      "action": {
+        "action_type": "resolve",
+        "ticket_id": "T3"
+      },
+      "reward": -0.20000000000000004,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.806545"
+    },
+    {
+      "step": 5,
+      "action": {
+        "action_type": "categorize",
+        "ticket_id": "T1",
+        "category": "auth"
+      },
+      "reward": -0.33000000000000007,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.810102"
+    },
+    {
+      "step": 6,
+      "action": {
+        "action_type": "set_priority",
+        "ticket_id": "T1",
+        "priority": "medium"
+      },
+      "reward": -0.03,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.816223"
+    },
+    {
+      "step": 7,
+      "action": {
+        "action_type": "route",
+        "ticket_id": "T1",
+        "queue": "tech"
+      },
+      "reward": -0.03,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.824008"
+    },
+    {
+      "step": 8,
+      "action": {
+        "action_type": "resolve",
+        "ticket_id": "T1"
+      },
+      "reward": 0.0,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.832058"
+    },
+    {
+      "step": 9,
+      "action": {
+        "action_type": "categorize",
+        "ticket_id": "T5",
+        "category": "logistics"
+      },
+      "reward": -0.02,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.840718"
+    },
+    {
+      "step": 10,
+      "action": {
+        "action_type": "set_priority",
+        "ticket_id": "T5",
+        "priority": "high"
+      },
+      "reward": -0.02,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.848347"
+    },
+    {
+      "step": 11,
+      "action": {
+        "action_type": "route",
+        "ticket_id": "T5",
+        "queue": "operations"
+      },
+      "reward": -0.02,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.856130"
+    },
+    {
+      "step": 12,
+      "action": {
+        "action_type": "resolve",
+        "ticket_id": "T5"
+      },
+      "reward": 0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.863445"
+    },
+    {
+      "step": 13,
+      "action": {
+        "action_type": "categorize",
+        "ticket_id": "T6",
+        "category": "logistics"
+      },
+      "reward": -0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.870595"
+    },
+    {
+      "step": 14,
+      "action": {
+        "action_type": "set_priority",
+        "ticket_id": "T6",
+        "priority": "high"
+      },
+      "reward": -0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.876844"
+    },
+    {
+      "step": 15,
+      "action": {
+        "action_type": "route",
+        "ticket_id": "T6",
+        "queue": "operations"
+      },
+      "reward": -0.01,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.884060"
+    },
+    {
+      "step": 16,
+      "action": {
+        "action_type": "resolve",
+        "ticket_id": "T6"
+      },
+      "reward": 0.02,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.890301"
+    },
+    {
+      "step": 17,
+      "action": {
+        "action_type": "categorize",
+        "ticket_id": "T2",
+        "category": "logistics"
+      },
+      "reward": 0.0,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.895169"
+    },
+    {
+      "step": 18,
+      "action": {
+        "action_type": "set_priority",
+        "ticket_id": "T2",
+        "priority": "urgent"
+      },
+      "reward": -0.02,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.902669"
+    },
+    {
+      "step": 19,
+      "action": {
+        "action_type": "route",
+        "ticket_id": "T2",
+        "queue": "operations"
+      },
+      "reward": 0.0,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.908626"
+    },
+    {
+      "step": 20,
+      "action": {
+        "action_type": "resolve",
+        "ticket_id": "T2"
+      },
+      "reward": 0.02,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.915421"
+    },
+    {
+      "step": 21,
+      "action": {
+        "action_type": "categorize",
+        "ticket_id": "T4",
+        "category": "feature"
+      },
+      "reward": 0.0,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.921826"
+    },
+    {
+      "step": 22,
+      "action": {
+        "action_type": "set_priority",
+        "ticket_id": "T4",
+        "priority": "low"
+      },
+      "reward": 0.0,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.931160"
+    },
+    {
+      "step": 23,
+      "action": {
+        "action_type": "route",
+        "ticket_id": "T4",
+        "queue": "product"
+      },
+      "reward": 0.0,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.938729"
+    },
+    {
+      "step": 24,
+      "action": {
+        "action_type": "resolve",
+        "ticket_id": "T4"
+      },
+      "reward": 0.02,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.944866"
+    },
+    {
+      "step": 25,
+      "action": {
+        "action_type": "submit"
+      },
+      "reward": 1.0,
+      "llm_tokens": 0,
+      "tool_calls": 0,
+      "timestamp": "2026-04-10T18:44:36.951768"
+    }
+  ]
+}
